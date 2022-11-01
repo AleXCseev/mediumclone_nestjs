@@ -34,7 +34,7 @@ export class ArticleService {
         })
     }
 
-    bildArticleResponse(article: ArticleEntity): ArticleResponseInterface {
+    buildArticleResponse(article: ArticleEntity): ArticleResponseInterface {
         return { article };
     }
 

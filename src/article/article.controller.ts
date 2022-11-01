@@ -16,12 +16,12 @@ export class ArticleController {
     @UseGuards(AuthGuard)
     async create(@User() currentUser: UserEntity, @Body("article") createArticleDto: CreateArticleDto): Promise<ArticleResponseInterface> {
         const article = await this.articleService.createArticle(currentUser, createArticleDto);
-        return this.articleService.bildArticleResponse(article);
+        return this.articleService.buildArticleResponse(article);
     }
 
     @Get(":slug")
     async getSingleArticle(@Param("slug") slug: string): Promise<ArticleResponseInterface> {
         const article = await this.articleService.findBySlug(slug);
-        return this.articleService.bildArticleResponse(article);
+        return this.articleService.buildArticleResponse(article);
     }
 }
