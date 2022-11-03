@@ -1,4 +1,4 @@
-import { UpdateUserDto } from './dto/updateUser.dto';
+import { UpdateUserDto } from '@app/user/dto/updateUser.dto';
 import { AuthGuard } from '@app/user/guards/auth.guard';
 import { UserEntity } from '@app/user/user.entity';
 import { UserResponseInterface } from '@app/user/types/userResponse.interface';

@@ -1,6 +1,6 @@
-import { UpdateUserDto } from './dto/updateUser.dto';
-import { LoginUserDto } from './dto/loginUser.dto';
-import { UserResponseInterface } from './types/userResponse.interface';
+import { UpdateUserDto } from '@app/user/dto/updateUser.dto';
+import { LoginUserDto } from '@app/user/dto/loginUser.dto';
+import { UserResponseInterface } from '@app/user/types/userResponse.interface';
 import { JWT_SECRET } from '@app/config';
 import { UserEntity } from '@app/user/user.entity';
 import { CreateUserDto } from '@app/user/dto/createUser.dto';

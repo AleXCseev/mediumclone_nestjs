@@ -1,6 +1,5 @@
-import { UserService } from '@app/user/user.service';
-import { AuthMiddleware } from './user/middlewares/auth.middleware';
-import { UserModule } from './user/user.module';
+import { AuthMiddleware } from '@app/user/middlewares/auth.middleware';
+import { UserModule } from '@app/user/user.module';
 import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { AppController } from '@app/app.controller';
 import { AppService } from '@app/app.service';
