@@ -1,4 +1,4 @@
-import { ValidationPipe } from '@nestjs/common';
+import { Query, ValidationPipe } from '@nestjs/common';
 import { ArticleResponseInterface } from '@app/article/types/articleResponse.interface';
 import { CreateArticleDto } from '@app/article/dto/createArtile.dto';
 import { UserEntity } from '@app/user/user.entity';
@@ -7,12 +7,18 @@ import { ArticleService } from '@app/article/article.service';
 import { Body, Controller, Post, Get, UseGuards, Param, Delete, Put, UsePipes } from '@nestjs/common';
 import { User } from '@app/user/decorators/user.decorator';
 import { DeleteResult } from 'typeorm';
+import { ArticlesResponseInterface } from '@app/article/types/articlesResponse.interface';
 
 
 @Controller('articles')
 export class ArticleController {
 
     constructor(private readonly articleService: ArticleService) {}
+
+    @Get()
+    async findAll(@User("id") currentUserId: number, @Query() query: any): Promise<ArticlesResponseInterface> {
+        return await this.articleService.findAll(currentUserId, query);
+    }
 
     @Post()
     @UseGuards(AuthGuard)
@@ -39,7 +45,6 @@ export class ArticleController {
     @UsePipes(new ValidationPipe())
     async updateArticle(@User("id") currentUserId: number, @Param("slug") slug: string, @Body("article") updateArticleDto: CreateArticleDto): Promise<ArticleResponseInterface> {
         const article = await this.articleService.updateArticle(slug, updateArticleDto, currentUserId);
-        return await this.articleService.buildArticleResponse(article);
-
+        return this.articleService.buildArticleResponse(article);
     }
 }
