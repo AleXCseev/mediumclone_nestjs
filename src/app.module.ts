@@ -7,9 +7,10 @@ import { TagModule } from '@app/tag/tag.module';
 import ormconfig from '@app/ormconfig';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ArticleModule } from '@app/article/article.module';
+import { ProfileModule } from './profile/profile.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(ormconfig) ,TagModule, UserModule, ArticleModule],
+  imports: [TypeOrmModule.forRoot(ormconfig) ,TagModule, UserModule, ArticleModule, ProfileModule],
   controllers: [AppController],
   providers: [AppService],
 })
