@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm';
-import { ArticlesResponseInterface } from './types/articlesResponse.interface';
+import { ArticlesResponseInterface } from '@app/article/types/articlesResponse.interface';
 import { HttpStatus } from '@nestjs/common';
 import { HttpException } from '@nestjs/common';
 import { ArticleResponseInterface } from '@app/article/types/articleResponse.interface';
@@ -10,6 +10,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository } from 'typeorm';
 import slugify from "slugify";
+import { FollowEntity } from '@app/profile/follow.entity';
 
 @Injectable()
 export class ArticleService {
@@ -17,7 +18,8 @@ export class ArticleService {
     constructor(
             @InjectRepository(ArticleEntity) private readonly articleRepository: Repository<ArticleEntity>, 
             private dataSource: DataSource,
-            @InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>
+            @InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>,
+            @InjectRepository(FollowEntity) private readonly followRepository: Repository<FollowEntity>
         ) {}
 
     async findAll(currentUserId: number, query: any): Promise<ArticlesResponseInterface> {
@@ -89,6 +91,43 @@ export class ArticleService {
         })
 
         return {articles: articlesWithFavorites, articlesCount}
+    }
+
+    async getFeed(currentUserId: number, query: any): Promise<ArticlesResponseInterface> {
+        const follows = await this.followRepository.find({
+            where: {
+                followerId: currentUserId
+            }
+        })
+
+        if(follows.length === 0) {
+            return { articles: [], articlesCount: 0}
+        }
+
+        const followingUserIds = follows.map(follow => follow.followingId);
+
+        const queryBuilder = this.dataSource
+            .getRepository(ArticleEntity)
+            .createQueryBuilder("articles")
+            .leftJoinAndSelect("articles.author", "author")
+            .where("articles.authorId IN (:...ids)", { ids: followingUserIds });
+
+        queryBuilder.orderBy("articles.createdAt", "DESC");
+
+        const articlesCount = await queryBuilder.getCount();
+
+        if(query.limit) {
+            queryBuilder.limit(query.limit);
+        }
+
+        if(query.offset) {
+            queryBuilder.offset(query.offset);
+        }
+
+        const articles = await queryBuilder.getMany()
+
+        return { articles, articlesCount }
+
     }
 
     async createArticle(currentUser: UserEntity, createArticleDto: CreateArticleDto): Promise<ArticleEntity> {

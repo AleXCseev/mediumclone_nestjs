@@ -1,4 +1,4 @@
-import { Query, ValidationPipe } from '@nestjs/common';
+import { Query } from '@nestjs/common';
 import { ArticleResponseInterface } from '@app/article/types/articleResponse.interface';
 import { CreateArticleDto } from '@app/article/dto/createArtile.dto';
 import { UserEntity } from '@app/user/user.entity';
@@ -8,6 +8,7 @@ import { Body, Controller, Post, Get, UseGuards, Param, Delete, Put, UsePipes } 
 import { User } from '@app/user/decorators/user.decorator';
 import { DeleteResult } from 'typeorm';
 import { ArticlesResponseInterface } from '@app/article/types/articlesResponse.interface';
+import { BackendValidationPipe } from '@app/shared/pipes/backendValidation.pipe';
 
 
 @Controller('articles')
@@ -18,6 +19,12 @@ export class ArticleController {
     @Get()
     async findAll(@User("id") currentUserId: number, @Query() query: any): Promise<ArticlesResponseInterface> {
         return await this.articleService.findAll(currentUserId, query);
+    }
+
+    @Get("feed")
+    @UseGuards(AuthGuard)
+    async getFeed(@User("id") currentUserId: number, @Query() query: any): Promise<ArticlesResponseInterface> {
+        return this.articleService.getFeed(currentUserId, query);
     }
 
     @Post(":slug/favorite")
@@ -36,7 +43,7 @@ export class ArticleController {
  
     @Post()
     @UseGuards(AuthGuard)
-    @UsePipes(new ValidationPipe())
+    @UsePipes(new BackendValidationPipe())
     async create(@User() currentUser: UserEntity, @Body("article") createArticleDto: CreateArticleDto): Promise<ArticleResponseInterface> {
         const article = await this.articleService.createArticle(currentUser, createArticleDto);
         return this.articleService.buildArticleResponse(article);
@@ -56,7 +63,7 @@ export class ArticleController {
 
     @Put(":slug")
     @UseGuards(AuthGuard)
-    @UsePipes(new ValidationPipe())
+    @UsePipes(new BackendValidationPipe())
     async updateArticle(@User("id") currentUserId: number, @Param("slug") slug: string, @Body("article") updateArticleDto: CreateArticleDto): Promise<ArticleResponseInterface> {
         const article = await this.articleService.updateArticle(slug, updateArticleDto, currentUserId);
         return this.articleService.buildArticleResponse(article);
